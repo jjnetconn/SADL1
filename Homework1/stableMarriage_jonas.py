@@ -1,4 +1,5 @@
 import sys
+import time
 
 # Helpers
 def isInt(i):
@@ -33,6 +34,8 @@ if ((len(sys.argv) < 2) or (len(sys.argv) > 4)):
    print "	<inputfile>	Filename of inputfile"
    print "	<testfile>		Filename of expected outputfile"
    exit()
+
+start_time_parsing = time.clock()
 
 # Parsing inputfile
 inputfile_name = sys.argv[1]
@@ -70,6 +73,8 @@ for line in inputfile:
 # Reading results
 #print "All persons: " + str(persons) + "\nMen Preferences: " + str(man_pref) + "\nRanking: " + str(ranking) 
 
+elapsed_time_parsing = time.clock() - start_time_parsing
+start_time = time.clock()
 
 # Gale-Shapley algorithm
 free_men = range(n)
@@ -93,6 +98,7 @@ while len(free_men) > 0:
 			free_men.append(current[w])
 			current[w] = m
 
+elapsed_time = time.clock() - start_time
 
 # print out matches
 result = ''
@@ -101,6 +107,7 @@ for man in range(n):
 	result += persons[man*2] + " -- " + persons[man_pref[man][next[man]-1]*2+1] + "\n"
 print result
 
+print "\nParsing time: " + str(elapsed_time_parsing) + "\nAlgorithm time: " + str(elapsed_time) + "\n"
 
 
 # Test output
@@ -111,4 +118,6 @@ if (len(sys.argv) == 3):
 		print "==============================\nOK\n=============================="
 	else:
 		print "==============================\nNOT OK\n=============================="
+
+
 

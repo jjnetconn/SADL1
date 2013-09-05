@@ -1,5 +1,5 @@
-
 import sys
+import time
 
 # Initialize
 debugMode = False # Set to true to switch on debug mode
@@ -24,6 +24,8 @@ if ((len(sys.argv) < 2) or (len(sys.argv) > 4)):
    print "	<inputfile>	Filename of inputfile"
    print "	<testfile>		Filename of expected outputfile"
    exit()
+
+start_time = time.clock()
 
 # Read inputfile
 inputFilename = sys.argv[1]
@@ -97,12 +99,16 @@ while (len(freeMen) > 0):
 	else:
 		freeMen.pop(0)
 
+elapsed_time = time.clock() - start_time
+
 # Output
 if (debugMode): print "=============================="
 result = ""
 for man in menPrefs.keys():
 	result += allPersons[man] + " -- " + allPersons[wife[man]] + "\n"
 print result
+
+print "\nTime: " + str(elapsed_time) + "\n"
 
 # Test output
 if (len(sys.argv) == 3):
