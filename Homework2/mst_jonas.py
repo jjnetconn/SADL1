@@ -55,10 +55,12 @@ def union(v, w):
 	# make smaller root point to larger one
 	if(rank[root_v] < rank[root_w]):
 		parent[root_v] = root_w
-		rank[root_w] += rank[root_v]
+		#rank[root_w] += rank[root_v]
 	else:
 		parent[root_w] = root_v
-		rank[root_v] += rank[root_w]
+		if(rank[root_v] == rank[root_w]):
+			rank[root_v] += 1
+		#rank[root_v] += rank[root_w]
 
 
 # Kruskals algorithm
