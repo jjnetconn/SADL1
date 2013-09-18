@@ -12,14 +12,28 @@ P = [
 				(0, 10, 'far')
 				]
 '''
-P = []
+
 
 # parse data
-inputfile_name = sys.argv[1]
-inputfile = open(inputfile_name, 'r')
-for line in inputfile:
-	if(not(line.split(' ')[0].isupper())):
-		P.append((float(line.split(' ')[1]),float(line.split(' ')[2].rstrip("\n")),line.split(' ')[0]))
+def test_input_file(inputf_name,input_dist):
+	P = []
+	inputf = open(inputf_name, 'r')
+	for line in inputf:
+		line = " ".join(line.split())
+		if(not(line.split(' ')[0].isupper()) and not(line == "") and len(line.split(' ')) == 3):
+			#print "About to split this line...: " + line
+			P.append((float(line.split(' ')[1]),float(line.split(' ')[2].rstrip("\n")),line.split(' ')[0]))
+	c0,c1 = closest_pair(P)
+
+	calc_dist = round(distance(c0,c1),2)
+	correct_dist = round(float(input_dist),2)
+	correct = 'ERROR'
+	if(calc_dist == correct_dist): correct = 'OK'
+	print "Testing input file: " + inputf_name + " - found: " + str(calc_dist) + " correct: " + str(correct_dist) + " -> " + correct
+	#print c0,c1
+	#print "Closest distance: " + str(round(distance(c0,c1),2))
+	#print "Distance should be: " + str(round(float(input_dist),2))
+	#print "\n"
 
 #print P
 
@@ -29,8 +43,9 @@ def distance(p1,p2):
 
 
 def closest_pair(p):
-	px = sorted(p, key=lambda x:p[0])
-	py = sorted(p, key=lambda x:p[1])
+	px = sorted(p, key=lambda x:x[0])
+	#global Py
+	py = sorted(p, key=lambda x:x[1])
 	return closest_pair_rec(px,py)
 
 
@@ -45,20 +60,31 @@ def closest_pair_rec(px, py):
 
 	q0,q1 = closest_pair_rec(qx,qy)
 	r0,r1 = closest_pair_rec(rx,ry)
-
-	#distance = lambda p1,p2 : math.sqrt(math.fabs(p1[0]-p2[0])**2 + math.fabs(p1[1]-p2[1])**2)
 	
 	delta = min(distance(q0,q1),distance(r0,r1))
+	#print "delta: " + str(delta)
+	#print len(py)
 	x_max = qx[len(qx)-1]
 
-	within_delta = lambda p : math.fabs(x_max[0]-p[0]) < delta
+	#print py
+	#print "\n\n"
+
+	within_delta = lambda x : math.fabs(x_max[0]-x[0]) < delta
 	sy = filter(within_delta, py)
+	#for y in sy:
+		#if(y[2] == '1273'):
+			#print 'OK 1 with x distance: ' + str(math.fabs(x_max[0]-y[0]))
+		#if(y[2] == '1310'):
+			#print 'OK 2 with x distance: ' + str(math.fabs(x_max[0]-y[0]))
 	#print "Py: " + str(py)
 	#print "Sy: " + str(sy)
 
 	closest0,closest1 = r0,r1
 	if(distance(q0,q1) < distance(r0,r1)):
 		closest0,closest1 = q0,q1
+
+	#if(len(sy)==1):
+		#print "x_max: " + str(x_max) + " and sy point: " + str(sy[0])
 
 	if(len(sy) > 1):
 		s_count = 0
@@ -75,14 +101,20 @@ def closest_pair_rec(px, py):
 				n_count += 1
 			s_count += 1
 		if(distance(s0,s1) < distance(closest0,closest1)):
+			#print "There is a closer distance in S: " + str(distance(s0,s1))
 			closest0,closest1 = s0,s1
 	
 	return closest0,closest1
 
 
-c0,c1 = closest_pair(P)
-print c0,c1
-print "With distance: " + str(distance(c0,c1))
+inputfile_name = sys.argv[1]
+inputfile = open(inputfile_name, 'r')
+for line in inputfile:
+	filename = line.split(' ')[0].rstrip(':')
+	dist = line.split(' ')[2].rstrip('\n')
+	test_input_file(filename,dist)
+
+
 
 
 
