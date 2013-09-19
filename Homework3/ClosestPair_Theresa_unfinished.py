@@ -31,13 +31,13 @@ def readInputfile(inputFilename):
     inputfile = open(inputFilename, 'r')
     numberPattern = '[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?';
     for line in inputfile:
-        match = re.match('(\w+)\s+(' + numberPattern + ')\s+(' + numberPattern + ')', line)
+        match = re.match('(\w+)\s+(' + numberPattern + ')\s+(' + numberPattern + ')', line.strip())
         if (match != None):
             #print '\n' + match.string + '---------------'
             values = re.findall(numberPattern, match.string)
             #print 'Values ' + str(values)
             if ((len(values) >= 2) and (len(values) <= 3)):
-                P.append([float(values[len(values)-2]),float(values[len(values)-1])])
+                P.append([float(values[len(values)-2]),float(values[len(values)-1]), match.string.split(" ")[0]])
             else:
                 print "ERROR: Unexpected input"
     
@@ -108,6 +108,7 @@ def closestPairRec(Px,Py):
         S = [x for x in Py if (math.fabs(int(L[0])-int(x[0])) < d)]
         #print "S: " + str(S)
         
+        '''
         for i in range(len(S)):
             for j in range(1,8):
                 if i+j < len(S):
@@ -117,6 +118,24 @@ def closestPairRec(Px,Py):
                         closestPairS = [(S[i],S[i+1]),tempD]
                         #print closestPairS[0]
                         return closestPairS[0]
+        '''      
+                    
+        if(len(S) > 1):
+            s_count = 0
+            s_min = distance(S[0],S[1])
+            closestPairS = [(S[0],S[1]),s_min]
+            for s in S:
+                n_count = 1
+                while s_count+n_count < len(S) and n_count < 16:
+                    n = S[s_count+n_count]
+                    s_next = distance(s,n)
+                    if(s_next < s_min):
+                        s_min = s_next
+                        closestPairS = [(s,n),s_min]
+                    n_count += 1
+                s_count += 1
+            if(closestPairS[1] < d):
+                return closestPairS
     
         if (closestPairQ[1] <= closestPairR[1]):
             return closestPairQ
@@ -128,7 +147,6 @@ def closestPairRec(Px,Py):
 if ((len(sys.argv) < 2) or (len(sys.argv) > 3)):
     printUsage()
     exit()
-P = []
 filepaths = []
 if (len(sys.argv) == 2):
     filepaths = [os.path.join(os.path.dirname(__file__), sys.argv[1])]
@@ -143,6 +161,11 @@ else:
     
 for filepath in filepaths:
     print filepath
-    readInputfile(filepath)
+    P = []
+    readInputfile(filepath)  
     #print "P: " + str(P)
-    print "Closest Pair: " + str(calculateClosestPair(P))
+    if (len(P) == 0):
+        print "NO POINTS"
+    else:
+        #print "Closest Pair: " + str(calculateClosestPair(P)[0])
+        print str(len(P)) + " " + str(calculateClosestPair(P)[1])
