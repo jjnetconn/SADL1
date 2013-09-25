@@ -19,9 +19,6 @@ def get_score(char_x,char_y):
 	#score = 0
 	return score
 
-def get_char_from_sequence(seq,index):
-	return seq[index]
-
 
 
 # Sequence algorithm
@@ -43,25 +40,40 @@ def alignment(X,Y):
 	x_sequence = y_sequence = ""
 	i = len(X)
 	j = len(Y)
-	while(i > 0 and j > 0):
-		max_score = max(M[j][i-1], M[j-1][i], M[j-1][i-1])
+	while(i > 0 or j > 0):
+		if(i <= 0): 
+			max_score = delta + M[j-1][i]
+		elif(j <= 0):
+			max_score = delta + M[j][i-1]
+		else:
+			alpha = get_score(X[i-1],Y[j-1])
+			max_score = max(delta + M[j][i-1], delta + M[j-1][i], alpha + M[j-1][i-1])
+
+		
+		print "score: " + str(alpha)
+		
+		print "max score: " + str(max_score)
 		print i, j
-		print M[j][i]
+		# diagonal
+		if(alpha + M[j-1][i-1] == max_score):
+			print "diagonal"
+			i -= 1
+			j -= 1
+			x_sequence = X[i] + x_sequence
+			y_sequence = Y[j] + y_sequence
 		# horizontal
-		if(M[j][i-1] == max_score):
+		elif(delta + M[j][i-1] == max_score):
+			print "horizontal"
 			i -= 1
 			x_sequence = X[i] + x_sequence
 			y_sequence = "-" + y_sequence
 		# vertical
-		elif(M[j-1][i] == max_score):
+		elif(delta + M[j-1][i] == max_score):
+			print "vertical"
 			j -= 1
 			x_sequence = "-" + x_sequence
 			y_sequence = Y[j] + y_sequence
-		else:
-			i -= 1
-			j -= 1
-			x_sequence = X[i] + x_sequence
-			y_sequence = Y[j] + y_sequence
+			
 
 
 	return M, M[len(Y)][len(X)], x_sequence, y_sequence
@@ -93,7 +105,7 @@ for line in score_file:
 			score_matrix.append(row)
 
 
-table,score,x_align,y_align = alignment("KQRIKAAKABK","KAK")
+table,score,x_align,y_align = alignment("KQRK","KQRIKAAKABK")
 print table
 print score
 print x_align
