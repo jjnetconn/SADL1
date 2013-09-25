@@ -12,11 +12,7 @@ def is_int(s):
         return False
 
 def get_score(char_x,char_y):
-	#print "Compare " + char_x + " with " + char_y
 	score = score_matrix[char_index[char_x]][char_index[char_y]]
-	#print "The score is " + str(score)
-	#print "\n"
-	#score = 0
 	return score
 
 
@@ -49,27 +45,19 @@ def alignment(X,Y):
 			alpha = get_score(X[i-1],Y[j-1])
 			max_score = max(delta + M[j][i-1], delta + M[j-1][i], alpha + M[j-1][i-1])
 
-		
-		print "score: " + str(alpha)
-		
-		print "max score: " + str(max_score)
-		print i, j
 		# diagonal
 		if(alpha + M[j-1][i-1] == max_score):
-			print "diagonal"
 			i -= 1
 			j -= 1
 			x_sequence = X[i] + x_sequence
 			y_sequence = Y[j] + y_sequence
 		# horizontal
 		elif(delta + M[j][i-1] == max_score):
-			print "horizontal"
 			i -= 1
 			x_sequence = X[i] + x_sequence
 			y_sequence = "-" + y_sequence
 		# vertical
 		elif(delta + M[j-1][i] == max_score):
-			print "vertical"
 			j -= 1
 			x_sequence = "-" + x_sequence
 			y_sequence = Y[j] + y_sequence
@@ -82,11 +70,14 @@ def alignment(X,Y):
 
 
 
-
-#parse score matrix
 char_index = dict()
 score_matrix = []
 
+
+#################
+## PARSING
+#################
+# score matrix
 inputfile_name = sys.argv[1]
 score_file = open(inputfile_name, 'r')
 for line in score_file:
@@ -104,10 +95,38 @@ for line in score_file:
 					row.append(int(i))
 			score_matrix.append(row)
 
+# input file
+specimen = []
+specimen_name = ""
+protein_string = ""
+count = 0
+inputfile_name = sys.argv[2]
+input_file = open(inputfile_name, 'r')
+for line in input_file:
+	if (line.startswith('>')):
+		if(count > 0):
+			specimen.append((specimen_name,protein_string))
+		items = " ".join(line.split())
+		specimen_name = items.split(' ')[0].lstrip('>')
+		protein_string = ""
+	elif(line.isupper()):
+		protein_string += line.rstrip('\n')
+	count += 1
+specimen.append((specimen_name,protein_string))
+#print specimen
 
-table,score,x_align,y_align = alignment("KQRK","KQRIKAAKABK")
-print table
-print score
-print x_align
-print y_align
+for i in range(len(specimen)):
+	for j in range(i+1,len(specimen)):
+		table,score,x_align,y_align = alignment(specimen[i][1],specimen[j][1])
+		print str(specimen[i][0]) + "--" + str(specimen[j][0]) + ": " + str(score)
+		print x_align
+		print y_align
+
+
+
+#table,score,x_align,y_align = alignment("KQRK","KQRIKAAKABK")
+#print table
+#print score
+#print x_align
+#print y_align
 
