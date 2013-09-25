@@ -44,19 +44,48 @@ def distance(p1,p2):
 
 def closest_pair(p):
 	px = sorted(p, key=lambda x:x[0])
-	#global Py
 	py = sorted(p, key=lambda x:x[1])
 	return closest_pair_rec(px,py)
 
 
 def closest_pair_rec(px, py):
 	if(len(px) < 3):
-		if(len(px) < 2): return px[0],(10000000,10000000,'infinity')
+		if(len(px) < 2): return px[0],(float('inf'),float('inf'),'infinity')
 		else: return px[0],px[1]
 	
 	splitter = len(px)/2
-	qx,qy = px[:splitter],py[:splitter]
-	rx,ry = px[splitter:],py[splitter:]
+	qx = px[:splitter]
+	rx = px[splitter:]
+
+	x_max = qx[-1][0]
+	qy,ry = [],[]
+	for p in py:
+		if(p[0] <= x_max):
+			qy.append(p)
+		else:
+			ry.append(p)
+
+	#qy, ry = [], []
+    #xDivider = qx[-1][0]
+    #for p in py:
+		#if p[0] <= xDivider:
+			#qy.append(p)
+ 		#else:
+			#ry.append(p)
+
+	#qx,qy = px[:splitter],py[:splitter]
+	#rx,ry = px[splitter:],py[splitter:]
+	#x_max = qx[-1]
+	#qy = filter(lambda x : x[0] >= qx[0][0] and x[0] <= qx[-1][0],py)
+	#ry = filter(lambda x : x[0] >= rx[0][0] and x[0] <= rx[-1][0],py)
+	#ry = filter(lambda x : x[0] > x_max,rx)
+
+	#qy = sorted(qx, key=lambda x:x[1])
+	#ry = sorted(rx, key=lambda x:x[1])
+
+
+	#qx,qy = px[:splitter],py[:splitter]
+	#rx,ry = px[splitter:],py[splitter:]
 
 	q0,q1 = closest_pair_rec(qx,qy)
 	r0,r1 = closest_pair_rec(rx,ry)
@@ -64,13 +93,16 @@ def closest_pair_rec(px, py):
 	delta = min(distance(q0,q1),distance(r0,r1))
 	#print "delta: " + str(delta)
 	#print len(py)
-	x_max = qx[len(qx)-1]
+	#x_max = qx[len(qx)-1]
 
 	#print py
 	#print "\n\n"
 
-	within_delta = lambda x : math.fabs(x_max[0]-x[0]) < delta
+	within_delta = lambda x : math.fabs(x_max-x[0]) < delta
 	sy = filter(within_delta, py)
+	#sy = sorted(sy, key=lambda x:x[1])
+
+	#sy = py
 	#for y in sy:
 		#if(y[2] == '1273'):
 			#print 'OK 1 with x distance: ' + str(math.fabs(x_max[0]-y[0]))
@@ -109,10 +141,13 @@ def closest_pair_rec(px, py):
 
 inputfile_name = sys.argv[1]
 inputfile = open(inputfile_name, 'r')
+count = 1
 for line in inputfile:
 	filename = line.split(' ')[0].rstrip(':')
 	dist = line.split(' ')[2].rstrip('\n')
+	#if(count==16): test_input_file(filename,dist)
 	test_input_file(filename,dist)
+	count += 1
 
 
 
