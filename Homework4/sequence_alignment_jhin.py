@@ -67,6 +67,14 @@ def alignment(X,Y):
 	return M, M[len(Y)][len(X)], x_sequence, y_sequence
 
 
+def is_in_dict(key,dict):
+	try:
+		dict[key]
+	except KeyError:
+		return False
+	else:
+		return True 
+
 
 
 
@@ -115,12 +123,47 @@ for line in input_file:
 specimen.append((specimen_name,protein_string))
 #print specimen
 
+# output file
+inputfile_name = sys.argv[3]
+output_file = open(inputfile_name, 'r')
+valid_output = dict()
+for line in output_file:
+	if(':' in line):
+		count = 0
+		comp_key = line.split(':')[0]
+		score = int(line.split(':')[1].strip(' ').strip('\n'))
+		valid_output[comp_key] = []
+		valid_output[comp_key].append(score)
+	elif(not(line == '')):
+		valid_output[comp_key].append(line.strip('\n'))
+#print valid_output
+
+
+
+#########
+## RUN
+#########
+# running algorithm on input file
 for i in range(len(specimen)):
 	for j in range(i+1,len(specimen)):
-		table,score,x_align,y_align = alignment(specimen[i][1],specimen[j][1])
-		print str(specimen[i][0]) + "--" + str(specimen[j][0]) + ": " + str(score)
+		spec1,spec2 = specimen[i][1],specimen[j][1]
+		comp_key = specimen[i][0] + "--" + specimen[j][0]
+		if(not(is_in_dict(comp_key,valid_output))): 
+			spec1,spec2 = specimen[j][1],specimen[i][1]
+			comp_key = specimen[j][0] + "--" + specimen[i][0]
+		table,score,x_align,y_align = alignment(spec1,spec2)
+		#comp_key = specimen[i][0] + "--" + specimen[j][0]
+		#if(not(is_in_dict(comp_key,valid_output))): comp_key = specimen[j][0] + "--" + specimen[i][0]
+		print comp_key + ": " + str(score)
 		print x_align
 		print y_align
+		#print valid_output[comp_key]
+		if(valid_output[comp_key][0] == score): valid_score = "OK"
+		else: valid_score = "ERROR"
+		if(valid_output[comp_key][1] == x_align and valid_output[comp_key][2] == y_align): valid_align = "OK"
+		else: valid_align = "ERROR"
+		print "Validating score... " + valid_score
+		print "Validating alignment... " + valid_align + "\n"
 
 
 
