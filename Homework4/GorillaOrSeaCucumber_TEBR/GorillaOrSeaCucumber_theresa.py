@@ -94,7 +94,6 @@ def Alignment(X,Y):
         return 0
     return A[len(Y)][len(X)]
 
-
 def SpaceEfficientAlignment(X,Y):
     # Initialize
     if ((len(Y) > 0) and (len(X) > 0)):
@@ -104,6 +103,7 @@ def SpaceEfficientAlignment(X,Y):
     # Minimum alignment cost
         for j in range(1,len(Y)+1):
             B[1][0] = scoreMatrix[Y[j-1].upper()]["*"]*j
+            #print B
             for i in range(1,len(X)+1):
                 B[1][i] = max(scoreMatrix[X[i-1].upper()][Y[j-1].upper()]+B[0][i-1],
                             scoreMatrix[X[i-1].upper()]["*"]+B[1][i-1],
@@ -114,26 +114,46 @@ def SpaceEfficientAlignment(X,Y):
         return 0
     return B[0][len(X)]
 
+
+def BackwardAlignment(X,Y):
+    # Initialize
+    if ((len(Y) > 0) and (len(X) > 0)):
+        A = [[0 for i in range(len(X)+1)] for j in range(len(Y)+1)]
+        for i in range(len(X),-1,-1):
+            A[len(Y)][len(X)-i] = scoreMatrix[X[len(X)-i-1].upper()]["*"]*i
+        for j in range(len(Y),-1,-1):
+            A[len(Y)-j][len(X)] = scoreMatrix[Y[len(Y)-j-1].upper()]["*"]*j
+    # Minimum alignment cost
+        for j in range(len(Y)-1,-1,-1):
+            for i in range(len(X)-1,-1,-1):
+                A[j][i] = max(scoreMatrix[X[i].upper()][Y[j].upper()]+A[j+1][i+1],
+                            scoreMatrix[X[i].upper()]["*"]+A[j+1][i],
+                            scoreMatrix["*"][Y[j].upper()]+A[j][i+1])
+    else:
+        return 0
+    return A[0][0]
+
 # Not working
 def BackwardSpaceEfficientAlignment(X,Y):
     # Initialize
     if ((len(Y) > 0) and (len(X) > 0)):
         B = [[0 for i in range(len(X)+1)] for j in range(2)]
         for i in range(len(X),-1,-1):
-            B[0][i] = scoreMatrix[X[i-1].upper()]["*"]*i
+            B[0][len(X)-i] = scoreMatrix[X[len(X)-i-1].upper()]["*"]*i
         print B
     # Minimum alignment cost
         for j in range(len(Y)-1,-1,-1):
-            B[1][0] = scoreMatrix[Y[j-1].upper()]["*"]*j
+            B[1][len(X)] = scoreMatrix[Y[j].upper()]["*"]*(j)
+            print "B: " + str(B)
             for i in range(len(X)-1,-1,-1):
                 #print "i: " + str(i)
+                #print B
                 B[1][i] = max(scoreMatrix[X[i].upper()][Y[j].upper()]+B[0][i+1],
                             scoreMatrix[X[i].upper()]["*"]+B[1][i+1],
                             scoreMatrix["*"][Y[j].upper()]+B[0][i])
+                #print B
             for i in range(len(X),-1,-1):
-                print "-" + str(B)
                 B[0][i] = B[1][i]
-                print B
     else:
         return 0
     return B[1][1]
@@ -159,6 +179,7 @@ else:
     print proteinStructures
     
     # Output
+    '''
     results = {}
     creatures = proteinStructures.keys()
     for c1 in range(len(creatures)):
@@ -183,10 +204,11 @@ else:
     
     '''
     print BackwardSpaceEfficientAlignment("KQRK","KAK")
+    print SpaceEfficientAlignment("KQRK","KAK")
     print BackwardSpaceEfficientAlignment("KAK","KQRK")
-    print BackwardSpaceEfficientAlignment("KQRIKAAKABK","KAK")
-    print BackwardSpaceEfficientAlignment("KAK","KQRIKAAKABK")
-    print BackwardSpaceEfficientAlignment("KQRK","KQRIKAAKABK")
-    print BackwardSpaceEfficientAlignment("KQRIKAAKABK","KQRK")
-    '''
+    print BackwardAlignment("KQRIKAAKABK","KAK")
+    print BackwardAlignment("KAK","KQRIKAAKABK")
+    print BackwardAlignment("KQRK","KQRIKAAKABK")
+    print BackwardAlignment("KQRIKAAKABK","KQRK")
+    #'''
     
