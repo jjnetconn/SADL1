@@ -50,8 +50,10 @@ def parseInputfile(filename):
         railway = re.findall(numberPattern,inputfile.readline().strip())  
         if (int(railway[2]) == -1):
             arcs[int(railway[0])][int(railway[1])] = sys.maxint
+            arcs[int(railway[1])][int(railway[0])] = sys.maxint
         else:
             arcs[int(railway[0])][int(railway[1])] = int(railway[2])
+            arcs[int(railway[1])][int(railway[0])] = int(railway[2])
     return [nodes,arcs]
 
 
