@@ -8,8 +8,6 @@ import sys
 import re
 import time
 import os
-import math
-from operator import itemgetter
 
 # Timers
 totalTimeS = 0
@@ -89,7 +87,7 @@ def BreadthFirstSearch(G,s,t):
     else:
         return None
 
-# ToDo
+#Calculates the MaxFlow and MinCut
 def FordFulkerson(G,s,t):
     #create residual graph
     residualG = [[0 for i in range(len(G))] for j in range(len(G))]
@@ -122,18 +120,58 @@ def FordFulkerson(G,s,t):
         #sum the bottlenecks
         maxFlow += bottleneck     
         path = BreadthFirstSearch(residualG,s,t)
+    minCut = getMinCut(G,s,residualG)
+    return [maxFlow,minCut]
 
-    return maxFlow
+#Find all reachable vertices from s and mark these as true
+def DepthFirstSearch(G,s,visited):
+    visited[s] = 1
+    for i in range(len(G)):
+        if (G[s][i]!=0 and visited[i]==0):
+            DepthFirstSearch(G, i, visited);
+ 
+#Calculates the MinCut:
+# Detect all reachable and non-reachable nodes in the residual graph from s
+# All edges in the original graph that are from a reachable node to non-reachable node in the residual graph
+def getMinCut(G,s,residualG):
+    visited = {}
+    for node in range(len(G)):
+        visited[node] = 0
+    DepthFirstSearch(residualG, s, visited)
+    result = []
+    for i in range(len(G)):
+        for j in range(len(G)):
+            if ((visited[i]==1) and (visited[j]==0) and (G[i][j]!=0)):
+                result.append([str(i),str(j)])
+    return result
 
-#Programm
+#Program
+totalTimeS = time.time()
 if ((len(sys.argv) != 2)):
     printUsage()
     exit()
 else:
+    importTimeS = time.time()
     inputfile = [os.path.join(os.path.dirname(__file__), sys.argv[1])][0]
     input = parseInputfile(inputfile)
-    print "NODES:" + str(input[0])
-    print "ARCS:"
-    printMatrix(input[1])
-    
-    print "RESULT: " + str(FordFulkerson(input[1],0,len(input[0])-1))
+    nodes = input[0]
+    edges = input[1]
+    importTimeE = time.time()
+    #print "NODES:" + str(nodes)
+    #print "EDGES:"
+    #printMatrix(edges)
+    algorithmTimeS = time.time()
+    result = FordFulkerson(input[1],0,len(input[0])-1)
+    algorithmTimeE = time.time()
+    print "MaxFlow: " + str(result[0])
+    print "MinCut: "
+    minCut = result[1]
+    for i in range(len(minCut)):
+        print str(nodes[int(minCut[i][0])]) + " - " + str(nodes[int(minCut[i][1])])
+
+totalTimeE = time.time()
+print "\n--------------------------------------------------\nTimers:" 
+print " - Total runtime: " + str(totalTimeE - totalTimeS) + " secs.\n"
+print " - Import data runtime: " + str(importTimeE - importTimeS)  + " secs.\n"
+print " - Algorithm runtime: " + str(algorithmTimeE - algorithmTimeS) + " secs.\n"
+print "--------------------------------------------------"
